@@ -10,6 +10,9 @@ import com.example.android.musicrock.Song;
 import com.example.android.musicrock.SongAdapter;
 import com.example.android.musicrock.MusicService.MusicBinder;
 
+import android.content.ContentUris;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -20,13 +23,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.MediaController.MediaPlayerControl;
 
-
+/*
+ * This is demo code to accompany the Mobiletuts+ series:
+ * Android SDK: Creating a Music Player
+ * 
+ * Sue Smith - February 2014
+ */
 
 public class MainActivity extends Activity implements MediaPlayerControl {
 
@@ -137,12 +147,26 @@ public class MainActivity extends Activity implements MediaPlayerControl {
 
     //method to retrieve song info from device
     public void getSongList(){
+        //Get album icon
+
         //query external audio
         ContentResolver musicResolver = getContentResolver();
+        ContentResolver musicResolve = getContentResolver();
         Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Uri smusicUri = android.provider.MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
         Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
+        Cursor music = musicResolve.query(smusicUri,null,null,null,null);
+        if(music !=null && music.moveToFirst())
+        {
+            int x=music.getColumnIndex(android.provider.MediaStore.Audio.Albums.ALBUM_ART);
+            String thisArt = music.getString(x);
+            Bitmap bm = BitmapFactory.decodeFile(thisArt);
+            ImageView image = (ImageView)findViewById(R.id.image);
+            image.setImageBitmap(bm);
+        }
         //iterate over results if valid
         if(musicCursor!=null && musicCursor.moveToFirst()){
+
             //get columns
             int titleColumn = musicCursor.getColumnIndex
                     (android.provider.MediaStore.Audio.Media.TITLE);
